@@ -1,9 +1,13 @@
-# BK Voltage Lab
+# BLE Voltage Lab
 
 A local-first Web Bluetooth dashboard for the **KONNWEI BK300** and other
 BKmonitor-compatible battery voltage monitors. It connects directly from a
 supported browser, displays live terminal voltage, graphs readings, reads the
 device identifier, and exposes a decoded packet log.
+
+It is also an installable Progressive Web App. Once loaded, the interface
+remains available offline; Bluetooth access still requires a compatible
+browser and a nearby device.
 
 This project turns the original
 [BKmonitor protocol reverse-engineering gist](https://gist.github.com/jr551/21f1e88d8efa7113deb9c139310b23b9)

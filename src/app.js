@@ -267,3 +267,10 @@ window.addEventListener("beforeunload", () => device?.gatt?.disconnect());
 renderCommands();
 setConnected(false);
 drawChart();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js", { scope: "./" })
+      .catch((error) => console.warn("Offline support could not start:", error));
+  });
+}
