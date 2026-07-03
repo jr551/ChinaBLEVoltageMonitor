@@ -134,7 +134,7 @@ void VoltageUI::drawHistory() {
     }
 }
 
-void VoltageUI::render(const MonitorState& state) {
+void VoltageUI::render(const MonitorState& state, const SagHealthState& sag) {
     if (millis() - lastFrameMs_ < 250) return;
     lastFrameMs_ = millis();
 
@@ -148,7 +148,9 @@ void VoltageUI::render(const MonitorState& state) {
     if (state.voltageValid) {
         BitmapFont::drawString(18, 57, String(state.volts, 2), kInk, kPanel, 4);
         BitmapFont::drawString(158, 70, "V", kAcid, kPanel, 2);
-        const uint8_t fuel = fuelPercent(state.volts);
+        const float fuelVoltage = sag.referenceVoltage > 0.0F
+            ? sag.referenceVoltage : state.volts;
+        const uint8_t fuel = fuelPercent(fuelVoltage);
         BitmapFont::drawString(226, 94, String(fuel) + "/100", kInk, kPanel, 1);
         drawFuelBar(fuel);
 
@@ -166,5 +168,15 @@ void VoltageUI::render(const MonitorState& state) {
     String flags = "F " + String(state.flagA) + "/" + String(state.flagB);
     if (state.rssi > -120) flags += " " + String(state.rssi);
     BitmapFont::drawString(226, 106, flags, kMuted, kPanel, 1);
+
+    LCD_FillRect(226, 84, 77, 8, kPanel);
+    String sagLabel;
+    if (sag.scoreValid) {
+        sagLabel = "SAG " + String(sag.score) + "/100";
+    } else {
+        sagLabel = "SAG " + String(sag.eventCount) + "/3";
+    }
+    BitmapFont::drawString(226, 84, sagLabel,
+                           sag.inSag ? kOrange : kMuted, kPanel, 1);
     drawHistory();
 }

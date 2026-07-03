@@ -1,11 +1,12 @@
 #pragma once
 
 #include "VoltageMonitor.h"
+#include "SagHealth.h"
 
 class VoltageUI {
   public:
     void begin();
-    void render(const MonitorState& state);
+    void render(const MonitorState& state, const SagHealthState& sag);
 
   private:
     void drawStatic();

@@ -21,6 +21,11 @@ bring-up details and small ST7789/bitmap-font implementation from
 - validates CRC-16/X-25 responses;
 - displays live voltage, raw state flags, RSSI, a 10S fuel estimate out of 100,
   and a short voltage trace;
+- learns voltage sag events, persists up to 50 in ESP32 NVS, compensates the
+  fuel estimate during a detected pull, and shows relative sag health after
+  three events;
+- optionally connects to a hardcoded Wi-Fi network and posts JSON telemetry at
+  a configurable interval;
 - reconnects automatically if the monitor disappears.
 
 Only the verified read-only command `0B 0B` is sent.
@@ -64,5 +69,27 @@ which in turn records them as confirmed against the official Waveshare demo.
 5. Confirm the same value with a trusted meter before relying on it.
 
 This first version is intentionally a display/transport demo. Sag history
-persistence and controls can be added after the board and live BLE path have
-been tested.
+persistence is included, but its `/100` result remains a relative trend rather
+than a true BMS state-of-health measurement. Comparisons are useful only when
+the loads are broadly similar.
+
+## Optional HTTP uploads
+
+Edit [`src/UserConfig.h`](src/UserConfig.h):
+
+```cpp
+constexpr bool WIFI_UPLOAD_ENABLED = true;
+constexpr char WIFI_SSID[] = "your-network";
+constexpr char WIFI_PSK[] = "your-password";
+constexpr char HTTP_POST_URL[] = "http://192.168.1.10:8080/ble-voltage";
+constexpr unsigned long HTTP_POST_INTERVAL_MS = 60000;
+```
+
+Uploads are disabled by default. When enabled, the board posts JSON containing
+voltage, state flags, BLE RSSI, sag status, fuel reference voltage, learned
+event count, and relative sag health. The HTTP request is sent only when Wi-Fi
+is connected and a valid voltage has been received.
+
+The configuration is intentionally hardcoded for simple private-network
+testing. Do not commit real Wi-Fi credentials to a public repository. Use
+HTTPS and authentication before sending data outside a trusted LAN.
