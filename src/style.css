@@ -30,12 +30,9 @@ button { color: inherit; }
 .button-primary { background: var(--acid); border-color: var(--acid); color: var(--acid-ink); margin-left: 8px; }
 .button-quiet { background: var(--panel-high); }
 .button-wide { width: 100%; margin-top: 22px; }
-main { max-width: 1180px; margin: auto; padding: 72px 24px; }
-.hero { min-height: 430px; display: grid; grid-template-columns: 1.12fr .88fr; align-items: center; gap: 8vw; }
+main { max-width: 1180px; margin: auto; padding: 40px 24px 72px; }
+.hero { display: block; }
 .eyebrow { color: var(--acid); font: 500 11px/1.4 "DM Mono", monospace; letter-spacing: .14em; margin: 0 0 15px; }
-h1 { font-size: clamp(46px, 6vw, 82px); line-height: .97; letter-spacing: -.065em; margin: 0; font-weight: 500; }
-h1 em { color: var(--muted); font-style: normal; }
-.lede { max-width: 500px; color: var(--muted); line-height: 1.7; font-size: 16px; margin-top: 28px; }
 .hardware-link { width: fit-content; display: flex; align-items: center; gap: 12px; margin-top: 24px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); text-decoration: none; transition: .18s ease; }
 .hardware-link:hover { border-color: #667b35; background: rgba(192, 242, 88, .04); transform: translateY(-1px); }
 .hardware-link span { color: var(--acid); font: 500 11px "DM Mono"; }
@@ -62,7 +59,7 @@ h1 em { color: var(--muted); font-style: normal; }
 .voltage-meta span, dt { color: var(--muted); font-size: 11px; }
 .voltage-meta strong { font: 500 13px "DM Mono"; }
 .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 18px; padding: 28px; }
-.chart-panel { margin: 42px 0 20px; }
+.chart-panel { margin: 20px 0; }
 h2 { margin: 0; font-size: 22px; letter-spacing: -.035em; font-weight: 600; }
 .toolbar { display: flex; gap: 8px; }
 .chart-wrap { height: 270px; margin-top: 28px; position: relative; }
@@ -70,6 +67,9 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.035em; font-weight: 600; }
 .chart-empty { position: absolute; inset: 0; display: grid; place-items: center; color: #667064; font-size: 13px; }
 .chart-empty[hidden] { display: none; }
 .grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 20px; }
+.about-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; margin-bottom: 20px; align-items: center; }
+.about-panel .muted, .about-details p { max-width: 500px; margin: 14px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.about-details .hardware-link { margin-top: 16px; }
 .facts { margin: 24px 0 0; }
 .facts div { display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--line); gap: 20px; }
 dd { margin: 0; font: 500 12px "DM Mono"; text-align: right; overflow-wrap: anywhere; }
@@ -101,14 +101,33 @@ footer a { color: var(--ink); text-decoration: none; }
 .toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
 @media (max-width: 760px) {
-  .topbar { padding: 0 16px; }
+  .topbar { height: 64px; padding: 0 12px; }
+  .brand { gap: 7px; font-size: 14px; }
+  .brand-mark { width: 28px; height: 28px; font-size: 18px; }
   .connection > span:not(.status-dot) { display: none; }
-  main { padding: 42px 16px; }
-  .hero, .grid { grid-template-columns: 1fr; }
-  .hero { gap: 44px; }
+  .connection { gap: 5px; }
+  .button-primary { margin-left: 4px; padding: 9px 13px; }
+  main { padding: 14px 10px 42px; }
+  .grid, .about-panel { grid-template-columns: 1fr; }
+  .voltage-card { min-height: 0; padding: 18px; border-radius: 16px; }
+  .voltage-readout { padding: 22px 0; }
+  .voltage-readout strong { font-size: clamp(62px, 22vw, 88px); }
+  .voltage-readout > span { font-size: 20px; margin-left: 8px; }
+  .estimate-copy, .estimate-scale { align-items: flex-start; }
+  .estimate-scale small { max-width: 175px; }
+  .voltage-meta { padding-top: 14px; }
+  .panel { padding: 18px; border-radius: 14px; }
+  .chart-panel { margin: 10px 0; }
+  .chart-wrap { height: 200px; margin-top: 18px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
-  .toolbar { flex-wrap: wrap; }
+  .toolbar { display: grid; width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .toolbar .button { padding: 9px 7px; font-size: 11px; }
+  .about-panel { gap: 8px; margin-bottom: 10px; }
+  .about-details p { margin-top: 0; }
+  .hardware-link { width: 100%; justify-content: space-between; }
   .command-list { grid-template-columns: 1fr; }
+  .raw-row { grid-template-columns: 78px 1fr; }
+  .raw-row .button { grid-column: 1 / -1; }
   .log-row { grid-template-columns: 60px 25px 1fr; }
   .log-row span { grid-column: 3; }
   footer { margin: 0 16px; padding-inline: 0; flex-direction: column; gap: 12px; }
