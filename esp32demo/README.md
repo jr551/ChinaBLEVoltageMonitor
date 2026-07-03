@@ -8,8 +8,8 @@ reference project:
 - ST7789, 172×320 pixels
 - landscape UI at 320×172
 
-The project contains no vape-specific code. It includes only the proven board
-bring-up details and a small ST7789/bitmap-font implementation.
+The project includes the proven board bring-up details and a small
+ST7789/bitmap-font implementation.
 
 ## What it does
 
