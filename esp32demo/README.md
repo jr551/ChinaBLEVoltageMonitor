@@ -10,7 +10,7 @@ reference project:
 
 The project contains no vape-specific code. It reuses only the proven board
 bring-up details and small ST7789/bitmap-font implementation from
-[`jr551/VapeESP32`](https://github.com/jr551/VapeESP32).
+
 
 ## What it does
 
