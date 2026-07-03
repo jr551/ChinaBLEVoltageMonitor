@@ -1,5 +1,6 @@
 import { UUIDS, PacketBuffer, buildRequest, parseHex, parsePacket, toHex } from "./protocol.js";
 import { estimateLithiumPack } from "./battery.js";
+import { SagTracker, loadSagHistory, relativeSagHealth, storeSagHistory } from "./sag.js";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -14,6 +15,9 @@ const elements = {
   chargeFill: $("#charge-fill"),
   chargeTrack: $(".charge-track"),
   packVoltage: $("#pack-voltage"),
+  healthScore: $("#health-score"),
+  healthDetail: $("#health-detail"),
+  resetHealth: $("#reset-health"),
   flagA: $("#flag-a"),
   flagB: $("#flag-b"),
   updated: $("#updated-at"),
@@ -56,6 +60,23 @@ let monitorTimer;
 let isConnecting = false;
 const packetBuffer = new PacketBuffer();
 const readings = [];
+const SAG_STORAGE_KEY = "ble-voltage-lab:sag-history:v1";
+let sagHistory = loadSagHistory(localStorage, SAG_STORAGE_KEY);
+const sagTracker = new SagTracker((event) => {
+  sagHistory.push(event);
+  storeSagHistory(localStorage, SAG_STORAGE_KEY, sagHistory);
+  renderSagHealth();
+});
+
+function renderSagHealth() {
+  const score = relativeSagHealth(sagHistory);
+  elements.healthScore.innerHTML = score === null
+    ? `— <small>/ 100</small>`
+    : `${score} <small>/ 100</small>`;
+  elements.healthDetail.textContent = score === null
+    ? `Learning · ${sagHistory.length} of 3 sag events`
+    : `${sagHistory.length} events stored locally · similar loads only`;
+}
 
 function renderCommands() {
   elements.commandList.innerHTML = commands.map((command) => `
@@ -175,14 +196,17 @@ function handlePacket({ command, payload }) {
   if (code === "4B 0B" && payload.length >= 4) {
     const volts = new DataView(payload.buffer, payload.byteOffset).getUint16(0, true) / 100;
     elements.voltage.textContent = volts.toFixed(2);
-    const estimate = estimateLithiumPack(volts);
+    const sag = sagTracker.add(volts);
+    const estimate = estimateLithiumPack(sag.referenceVoltage);
     elements.batteryEstimate.hidden = !estimate;
     if (estimate) {
       elements.packLabel.textContent = estimate.label;
       elements.chargePercent.textContent = estimate.percent;
       elements.chargeFill.style.width = `${estimate.percent}%`;
       elements.chargeTrack.setAttribute("aria-valuenow", estimate.percent);
-      elements.packVoltage.textContent = `${volts.toFixed(2)} / ${estimate.fullVoltage.toFixed(1)} V`;
+      elements.packVoltage.textContent = sag.inSag
+        ? `${volts.toFixed(2)} V loaded · fuel from ${sag.referenceVoltage.toFixed(2)} V`
+        : `${volts.toFixed(2)} / ${estimate.fullVoltage.toFixed(1)} V`;
     }
     elements.flagA.textContent = payload[2];
     elements.flagB.textContent = payload[3];
@@ -260,6 +284,12 @@ elements.toggleMonitor.addEventListener("click", () => {
   }
 });
 elements.clearChart.addEventListener("click", () => { readings.length = 0; drawChart(); });
+elements.resetHealth.addEventListener("click", () => {
+  sagHistory = [];
+  storeSagHistory(localStorage, SAG_STORAGE_KEY, sagHistory);
+  renderSagHealth();
+  showToast("Learned sag history cleared");
+});
 elements.commandList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-command]");
   if (button) send(parseHex(button.dataset.command)).catch((error) => showToast(error.message));
@@ -281,6 +311,7 @@ window.addEventListener("resize", drawChart);
 window.addEventListener("beforeunload", () => device?.gatt?.disconnect());
 
 renderCommands();
+renderSagHealth();
 setConnected(false);
 drawChart();
 

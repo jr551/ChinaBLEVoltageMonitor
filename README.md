@@ -10,6 +10,13 @@ likely 10S conventional lithium-ion pack: 42.0 V full (10 × 4.2 V). It shows a
 voltage-based charge estimate, not a BMS state-of-charge reading. Parallel
 count such as `4P` cannot be inferred from terminal voltage.
 
+While continuous monitoring is active, the app detects voltage-sag and
+recovery events. It stores up to 50 events in browser local storage and, after
+three events, reports a relative sag-health trend against that pack's best
+recorded behaviour. During a detected sag, the fuel estimate uses the pre-sag
+voltage. Because current is unknown, the health trend is meaningful only when
+the compared loads are broadly similar; it is not a BMS SOH measurement.
+
 It is also an installable Progressive Web App. Once loaded, the interface
 remains available offline; Bluetooth access still requires a compatible
 browser and a nearby device.
