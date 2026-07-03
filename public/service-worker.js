@@ -1,4 +1,4 @@
-const CACHE_NAME = "ble-voltage-lab-v5";
+const CACHE_NAME = "ble-voltage-lab-v6";
 const APP_SHELL = [
   "./",
   "./manifest.webmanifest",
@@ -6,6 +6,7 @@ const APP_SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
+  "./ble-voltage-lab-preview.png",
 ];
 
 self.addEventListener("install", (event) => {

@@ -21,6 +21,12 @@ It is also an installable Progressive Web App. Once loaded, the interface
 remains available offline; Bluetooth access still requires a compatible
 browser and a nearby device.
 
+<p align="center">
+  <a href="https://jr551.github.io/ChinaBLEVoltageMonitor/">
+    <img src="public/ble-voltage-lab-preview.png" width="390" alt="BLE Voltage Lab connected to a 10S lithium-ion battery, showing 40.88 volts, a 94 out of 100 fuel estimate, relative sag health, and the voltage trace." />
+  </a>
+</p>
+
 This project turns the original
 [BKmonitor protocol reverse-engineering gist](https://gist.github.com/jr551/21f1e88d8efa7113deb9c139310b23b9)
 into a tested, maintainable repository.
