@@ -88,3 +88,10 @@ Captures and decoded payloads are welcome. Redact device identifiers,
 manufacturer data, and other unique values before opening an issue.
 
 This is independent interoperability research, not vendor documentation.
+
+## ESP32 screen demo
+
+[`esp32demo/`](esp32demo/) contains compile-tested PlatformIO firmware for the
+Waveshare ESP32-C6-LCD-1.47 board. It connects directly to the monitor and
+renders voltage, 10S fuel estimate, flags, RSSI, and a short trace on the
+onboard 320×172 landscape display.
