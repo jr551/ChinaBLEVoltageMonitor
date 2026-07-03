@@ -40,8 +40,16 @@ main { max-width: 1180px; margin: auto; padding: 40px 24px 72px; }
 .voltage-card { padding: 28px; min-height: 340px; border: 1px solid #3b4437; border-radius: 22px; background: linear-gradient(145deg, #1d241c, #141914); box-shadow: 0 24px 80px rgba(0, 0, 0, .24); }
 .card-heading, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .card-heading { color: var(--muted); font-size: 13px; }
+.state-pills { display: flex; align-items: center; gap: 7px; }
 .live-pill { font: 500 10px "DM Mono"; letter-spacing: .08em; border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; }
 .live-pill.online { color: var(--acid); border-color: #526332; }
+.charge-pill { color: #d8ff89; font: 500 9px "DM Mono"; letter-spacing: .06em; border: 1px solid #85a83d; border-radius: 999px; padding: 6px 9px; background: rgba(192, 242, 88, .08); }
+.charge-pill[hidden] { display: none; }
+.voltage-card.charging { border-color: #91b946; animation: charge-glow 1.8s ease-in-out infinite; }
+@keyframes charge-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(192, 242, 88, .05), 0 24px 80px rgba(0, 0, 0, .24); }
+  50% { box-shadow: 0 0 28px rgba(192, 242, 88, .32), inset 0 0 22px rgba(192, 242, 88, .05); }
+}
 .voltage-readout { display: flex; align-items: baseline; justify-content: center; padding: 25px 0; }
 .voltage-readout strong { font: 500 clamp(74px, 9vw, 116px)/1 "DM Mono", monospace; letter-spacing: -.1em; }
 .voltage-readout > span { color: var(--acid); font: 500 24px "DM Mono"; margin-left: 12px; }
@@ -120,6 +128,8 @@ footer a { color: var(--ink); text-decoration: none; }
   main { padding: 14px 10px 42px; }
   .grid, .about-panel { grid-template-columns: 1fr; }
   .voltage-card { min-height: 0; padding: 18px; border-radius: 16px; }
+  .state-pills { gap: 4px; }
+  .charge-pill, .live-pill { padding: 5px 7px; font-size: 8px; }
   .voltage-readout { padding: 22px 0; }
   .voltage-readout strong { font-size: clamp(62px, 22vw, 88px); }
   .voltage-readout > span { font-size: 20px; margin-left: 8px; }

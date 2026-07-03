@@ -21,7 +21,7 @@ void TelemetryUploader::begin() {
 }
 
 void TelemetryUploader::tick(
-    const MonitorState& monitor, const SagHealthState& sag) {
+    const MonitorState& monitor, const SagHealthState& sag, const ChargeState& charge) {
     if (!WIFI_UPLOAD_ENABLED) return;
 
     if (WiFi.status() != WL_CONNECTED) {
@@ -46,6 +46,8 @@ void TelemetryUploader::tick(
     body += ",\"flag_b\":" + String(monitor.flagB);
     body += ",\"ble_rssi\":" + String(monitor.rssi);
     body += ",\"sag_active\":" + String(sag.inSag ? "true" : "false");
+    body += ",\"likely_charging\":" + String(charge.likelyCharging ? "true" : "false");
+    body += ",\"charge_rise_volts\":" + String(charge.riseVolts, 3);
     body += ",\"fuel_reference_voltage\":" + String(sag.referenceVoltage, 2);
     body += ",\"sag_events\":" + String(sag.eventCount);
     if (sag.scoreValid) {

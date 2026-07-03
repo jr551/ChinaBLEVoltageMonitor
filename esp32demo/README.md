@@ -25,6 +25,8 @@ ST7789/bitmap-font implementation.
   three events;
 - optionally connects to a hardcoded Wi-Fi network and posts JSON telemetry at
   a configurable interval;
+- detects a sustained rising-voltage trend as likely charging, shows
+  `CHARGING`, and pulses a border around the screen;
 - reconnects automatically if the monitor disappears.
 
 Only the verified read-only command `0B 0B` is sent.
@@ -85,9 +87,10 @@ constexpr unsigned long HTTP_POST_INTERVAL_MS = 60000;
 ```
 
 Uploads are disabled by default. When enabled, the board posts JSON containing
-voltage, state flags, BLE RSSI, sag status, fuel reference voltage, learned
-event count, and relative sag health. The HTTP request is sent only when Wi-Fi
-is connected and a valid voltage has been received.
+voltage, state flags, BLE RSSI, sag status, likely-charging state, observed
+voltage rise, fuel reference voltage, learned event count, and relative sag
+health. The HTTP request is sent only when Wi-Fi is connected and a valid
+voltage has been received.
 
 The configuration is intentionally hardcoded for simple private-network
 testing. Do not commit real Wi-Fi credentials to a public repository. Use

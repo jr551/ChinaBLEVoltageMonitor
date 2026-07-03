@@ -134,15 +134,20 @@ void VoltageUI::drawHistory() {
     }
 }
 
-void VoltageUI::render(const MonitorState& state, const SagHealthState& sag) {
+void VoltageUI::render(
+    const MonitorState& state, const SagHealthState& sag, const ChargeState& charge) {
     if (millis() - lastFrameMs_ < 250) return;
     lastFrameMs_ = millis();
 
     LCD_FillRect(236, 7, 75, 10, kPanelDark);
-    const char* status = state.connected ? "CONNECTED" :
-                         (state.scanning ? "SCANNING" : "SEARCHING");
+    const char* status = charge.likelyCharging
+        ? "CHARGING"
+        : (state.connected
+            ? "CONNECTED"
+            : (state.scanning ? "SCANNING" : "SEARCHING"));
     BitmapFont::drawString(236, 8, status,
-                           state.connected ? kAcid : kOrange, kPanelDark, 1);
+                           (state.connected || charge.likelyCharging) ? kAcid : kOrange,
+                           kPanelDark, 1);
 
     LCD_FillRect(18, 56, 181, 33, kPanel);
     if (state.voltageValid) {
@@ -179,4 +184,11 @@ void VoltageUI::render(const MonitorState& state, const SagHealthState& sag) {
     BitmapFont::drawString(226, 84, sagLabel,
                            sag.inSag ? kOrange : kMuted, kPanel, 1);
     drawHistory();
+
+    const uint16_t glow = ((millis() / 350) % 2) ? kAcid : 0x4E47;
+    border(0, 0, LCD_WIDTH, LCD_HEIGHT,
+           charge.likelyCharging ? glow : kBg);
+    if (charge.likelyCharging) {
+        border(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, glow);
+    }
 }

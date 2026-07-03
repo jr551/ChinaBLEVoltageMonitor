@@ -2,11 +2,12 @@
 
 #include "VoltageMonitor.h"
 #include "SagHealth.h"
+#include "ChargeDetector.h"
 
 class VoltageUI {
   public:
     void begin();
-    void render(const MonitorState& state, const SagHealthState& sag);
+    void render(const MonitorState& state, const SagHealthState& sag, const ChargeState& charge);
 
   private:
     void drawStatic();

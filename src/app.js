@@ -1,6 +1,7 @@
 import { UUIDS, PacketBuffer, buildRequest, parseHex, parsePacket, toHex } from "./protocol.js";
 import { estimateLithiumPack } from "./battery.js";
 import { SagTracker, loadSagHistory, relativeSagHealth, storeSagHistory } from "./sag.js";
+import { ChargeDetector } from "./charge.js";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -8,6 +9,7 @@ const elements = {
   statusDot: $("#status-dot"),
   status: $("#status-label"),
   livePill: $("#live-pill"),
+  chargePill: $("#charge-pill"),
   voltage: $("#voltage-value"),
   batteryEstimate: $("#battery-estimate"),
   packLabel: $("#pack-label"),
@@ -67,6 +69,7 @@ const sagTracker = new SagTracker((event) => {
   storeSagHistory(localStorage, SAG_STORAGE_KEY, sagHistory);
   renderSagHealth();
 });
+const chargeDetector = new ChargeDetector();
 
 function renderSagHealth() {
   const score = relativeSagHealth(sagHistory);
@@ -197,6 +200,9 @@ function handlePacket({ command, payload }) {
     const volts = new DataView(payload.buffer, payload.byteOffset).getUint16(0, true) / 100;
     elements.voltage.textContent = volts.toFixed(2);
     const sag = sagTracker.add(volts);
+    const charging = chargeDetector.add(volts, Date.now(), sag.inSag || Boolean(sag.event));
+    elements.chargePill.hidden = !charging;
+    elements.batteryEstimate.closest(".voltage-card").classList.toggle("charging", charging);
     const estimate = estimateLithiumPack(sag.referenceVoltage);
     elements.batteryEstimate.hidden = !estimate;
     if (estimate) {

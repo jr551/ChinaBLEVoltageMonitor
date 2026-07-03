@@ -4,12 +4,14 @@
 #include "VoltageUI.h"
 #include "SagHealth.h"
 #include "TelemetryUploader.h"
+#include "ChargeDetector.h"
 
 namespace {
 VoltageMonitor monitor;
 VoltageUI ui;
 SagHealth sagHealth;
 TelemetryUploader uploader;
+ChargeDetector chargeDetector;
 unsigned long lastProcessedUpdateMs = 0;
 }
 
@@ -29,8 +31,9 @@ void loop() {
     if (state.voltageValid && state.updatedMs != lastProcessedUpdateMs) {
         lastProcessedUpdateMs = state.updatedMs;
         sagHealth.add(state.volts, state.updatedMs);
+        chargeDetector.add(state.volts, state.updatedMs, sagHealth.state().inSag);
     }
-    ui.render(state, sagHealth.state());
-    uploader.tick(state, sagHealth.state());
+    ui.render(state, sagHealth.state(), chargeDetector.state());
+    uploader.tick(state, sagHealth.state(), chargeDetector.state());
     delay(5);
 }

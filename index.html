@@ -50,7 +50,10 @@
         <div class="voltage-card">
           <div class="card-heading">
             <span>Terminal voltage</span>
-            <span class="live-pill" id="live-pill">OFFLINE</span>
+            <div class="state-pills">
+              <span class="charge-pill" id="charge-pill" hidden>LIKELY CHARGING</span>
+              <span class="live-pill" id="live-pill">OFFLINE</span>
+            </div>
           </div>
           <div class="voltage-readout">
             <strong id="voltage-value">—</strong><span>V</span>
