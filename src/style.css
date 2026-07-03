@@ -40,14 +40,23 @@ h1 em { color: var(--muted); font-style: normal; }
 .hardware-link:hover { border-color: #667b35; background: rgba(192, 242, 88, .04); transform: translateY(-1px); }
 .hardware-link span { color: var(--acid); font: 500 11px "DM Mono"; }
 .hardware-link small { color: var(--muted); font-size: 10px; }
-.voltage-card { padding: 28px; min-height: 290px; border: 1px solid #3b4437; border-radius: 22px; background: linear-gradient(145deg, #1d241c, #141914); box-shadow: 0 24px 80px rgba(0, 0, 0, .24); }
+.voltage-card { padding: 28px; min-height: 340px; border: 1px solid #3b4437; border-radius: 22px; background: linear-gradient(145deg, #1d241c, #141914); box-shadow: 0 24px 80px rgba(0, 0, 0, .24); }
 .card-heading, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .card-heading { color: var(--muted); font-size: 13px; }
 .live-pill { font: 500 10px "DM Mono"; letter-spacing: .08em; border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; }
 .live-pill.online { color: var(--acid); border-color: #526332; }
-.voltage-readout { display: flex; align-items: baseline; justify-content: center; padding: 30px 0; }
+.voltage-readout { display: flex; align-items: baseline; justify-content: center; padding: 25px 0; }
 .voltage-readout strong { font: 500 clamp(74px, 9vw, 116px)/1 "DM Mono", monospace; letter-spacing: -.1em; }
 .voltage-readout > span { color: var(--acid); font: 500 24px "DM Mono"; margin-left: 12px; }
+.battery-estimate { padding: 14px 0 18px; border-top: 1px solid var(--line); }
+.battery-estimate[hidden] { display: none; }
+.estimate-copy, .estimate-scale { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.estimate-copy span { color: var(--acid); font: 500 11px "DM Mono"; }
+.estimate-copy strong { font: 500 12px "DM Mono"; }
+.charge-track { height: 8px; margin: 10px 0 8px; overflow: hidden; border-radius: 999px; background: #303830; }
+.charge-track span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #86b82d, var(--acid)); transition: width .35s ease; }
+.estimate-scale { color: var(--muted); font: 10px "DM Mono"; }
+.estimate-scale small { font-size: 9px; text-align: right; }
 .voltage-meta { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); padding-top: 18px; gap: 10px; }
 .voltage-meta div { display: flex; flex-direction: column; gap: 5px; }
 .voltage-meta span, dt { color: var(--muted); font-size: 11px; }

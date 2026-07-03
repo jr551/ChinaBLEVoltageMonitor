@@ -1,4 +1,4 @@
-const CACHE_NAME = "ble-voltage-lab-v1";
+const CACHE_NAME = "ble-voltage-lab-v2";
 const APP_SHELL = [
   "./",
   "./manifest.webmanifest",

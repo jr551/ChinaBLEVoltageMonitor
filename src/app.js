@@ -1,4 +1,5 @@
 import { UUIDS, PacketBuffer, buildRequest, parseHex, parsePacket, toHex } from "./protocol.js";
+import { estimateLithiumPack } from "./battery.js";
 
 const $ = (selector) => document.querySelector(selector);
 const elements = {
@@ -7,6 +8,12 @@ const elements = {
   status: $("#status-label"),
   livePill: $("#live-pill"),
   voltage: $("#voltage-value"),
+  batteryEstimate: $("#battery-estimate"),
+  packLabel: $("#pack-label"),
+  chargePercent: $("#charge-percent"),
+  chargeFill: $("#charge-fill"),
+  chargeTrack: $(".charge-track"),
+  packVoltage: $("#pack-voltage"),
   flagA: $("#flag-a"),
   flagB: $("#flag-b"),
   updated: $("#updated-at"),
@@ -168,6 +175,15 @@ function handlePacket({ command, payload }) {
   if (code === "4B 0B" && payload.length >= 4) {
     const volts = new DataView(payload.buffer, payload.byteOffset).getUint16(0, true) / 100;
     elements.voltage.textContent = volts.toFixed(2);
+    const estimate = estimateLithiumPack(volts);
+    elements.batteryEstimate.hidden = !estimate;
+    if (estimate) {
+      elements.packLabel.textContent = estimate.label;
+      elements.chargePercent.textContent = estimate.percent;
+      elements.chargeFill.style.width = `${estimate.percent}%`;
+      elements.chargeTrack.setAttribute("aria-valuenow", estimate.percent);
+      elements.packVoltage.textContent = `${volts.toFixed(2)} / ${estimate.fullVoltage.toFixed(1)} V`;
+    }
     elements.flagA.textContent = payload[2];
     elements.flagB.textContent = payload[3];
     elements.updated.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });

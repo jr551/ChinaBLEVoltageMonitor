@@ -5,6 +5,11 @@ BKmonitor-compatible battery voltage monitors. It connects directly from a
 supported browser, displays live terminal voltage, graphs readings, reads the
 device identifier, and exposes a decoded packet log.
 
+For readings between 30 and 42.5 V, the dashboard treats the battery as a
+likely 10S conventional lithium-ion pack: 42.0 V full (10 × 4.2 V). It shows a
+voltage-based charge estimate, not a BMS state-of-charge reading. Parallel
+count such as `4P` cannot be inferred from terminal voltage.
+
 It is also an installable Progressive Web App. Once loaded, the interface
 remains available offline; Bluetooth access still requires a compatible
 browser and a nearby device.

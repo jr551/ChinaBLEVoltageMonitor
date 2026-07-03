@@ -57,6 +57,19 @@
           <div class="voltage-readout">
             <strong id="voltage-value">—</strong><span>V</span>
           </div>
+          <div class="battery-estimate" id="battery-estimate" hidden>
+            <div class="estimate-copy">
+              <span id="pack-label">Likely 10S Li-ion</span>
+              <strong><span id="charge-percent">—</span>% estimated</strong>
+            </div>
+            <div class="charge-track" role="progressbar" aria-label="Estimated battery charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span id="charge-fill"></span>
+            </div>
+            <div class="estimate-scale">
+              <span id="pack-voltage">— / 42.0 V</span>
+              <small>Voltage-only estimate · load affects accuracy · parallel count unknown</small>
+            </div>
+          </div>
           <div class="voltage-meta">
             <div><span>Flag A</span><strong id="flag-a">—</strong></div>
             <div><span>Flag B</span><strong id="flag-b">—</strong></div>
