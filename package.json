@@ -1,0 +1,14 @@
+{
+  "name": "china-ble-voltage-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build --base=./",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}
