@@ -36,6 +36,10 @@ main { max-width: 1180px; margin: auto; padding: 72px 24px; }
 h1 { font-size: clamp(46px, 6vw, 82px); line-height: .97; letter-spacing: -.065em; margin: 0; font-weight: 500; }
 h1 em { color: var(--muted); font-style: normal; }
 .lede { max-width: 500px; color: var(--muted); line-height: 1.7; font-size: 16px; margin-top: 28px; }
+.hardware-link { width: fit-content; display: flex; align-items: center; gap: 12px; margin-top: 24px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); text-decoration: none; transition: .18s ease; }
+.hardware-link:hover { border-color: #667b35; background: rgba(192, 242, 88, .04); transform: translateY(-1px); }
+.hardware-link span { color: var(--acid); font: 500 11px "DM Mono"; }
+.hardware-link small { color: var(--muted); font-size: 10px; }
 .voltage-card { padding: 28px; min-height: 290px; border: 1px solid #3b4437; border-radius: 22px; background: linear-gradient(145deg, #1d241c, #141914); box-shadow: 0 24px 80px rgba(0, 0, 0, .24); }
 .card-heading, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .card-heading { color: var(--muted); font-size: 13px; }

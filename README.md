@@ -1,13 +1,29 @@
 # BK Voltage Lab
 
-A local-first Web Bluetooth dashboard for BKmonitor-compatible battery voltage
-monitors. It connects directly from a supported browser, displays live terminal
-voltage, graphs readings, reads the device identifier, and exposes a decoded
-packet log.
+A local-first Web Bluetooth dashboard for the **KONNWEI BK300** and other
+BKmonitor-compatible battery voltage monitors. It connects directly from a
+supported browser, displays live terminal voltage, graphs readings, reads the
+device identifier, and exposes a decoded packet log.
 
 This project turns the original
 [BKmonitor protocol reverse-engineering gist](https://gist.github.com/jr551/21f1e88d8efa7113deb9c139310b23b9)
 into a tested, maintainable repository.
+
+## Hardware
+
+The reverse engineering was verified with a KONNWEI-branded unit advertising
+as `bikebattery`. The same BK300 hardware and protocol may be sold under other
+brand names.
+
+- [Example AliExpress BK300 listing](https://s.click.aliexpress.com/e/_c3i1uXXr)
+  (item `1005007797314538`)
+- Observed price: approximately **£6.49** in July 2026; marketplace prices,
+  taxes, delivery costs, and variants change.
+
+The linked listing describes the device as a “BK300 Lead Acid Starting Car
+Battery Detector” for 12 V and 24 V systems. A matching case or product name
+does not guarantee matching firmware, so verify service UUID `FFF0` before
+experimenting.
 
 ## Try it
 

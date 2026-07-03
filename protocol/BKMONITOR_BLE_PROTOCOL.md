@@ -4,8 +4,10 @@ Reverse-engineered from BKmonitor Android app 1.1.5
 (`com.jiawei.batteryonline`) and verified against a live device in July 2026.
 
 This document describes the proprietary Bluetooth Low Energy protocol used by
-at least one BKmonitor-compatible battery monitor. The tested unit advertised
-as `bikebattery`.
+at least one BKmonitor-compatible battery monitor. The tested retail unit was
+KONNWEI-branded and advertised over BLE as `bikebattery`. Visually similar
+BK300 units are sold under other names and may use the same protocol, although
+matching hardware or branding does not prove firmware compatibility.
 
 ## Summary
 
@@ -260,6 +262,8 @@ and live BLE captures. No firmware was modified.
 Tested:
 
 ```text
+Retail brand:    KONNWEI
+Product family:  BK300
 Android package: com.jiawei.batteryonline
 App version:     BKmonitor 1.1.5
 BLE local name:  bikebattery
@@ -268,6 +272,11 @@ Notify:          FFF1
 Write:           FFF2
 Observed volts:  40.87 V
 ```
+
+An example BK300 listing (AliExpress item `1005007797314538`) was approximately
+£6.49 in July 2026. Marketplace pricing and branding are volatile; this detail
+is included only to help identify the inexpensive hardware family, not as a
+current-price claim or compatibility guarantee.
 
 Different firmware versions may reuse the transport while changing command
 payloads. Please contribute captures with secrets and unique identifiers
