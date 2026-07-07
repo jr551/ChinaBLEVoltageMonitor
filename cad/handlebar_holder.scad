@@ -7,6 +7,9 @@ board_w = 20.32;
 board_h = 36.37;
 board_clearance = 0.45;
 board_depth = 8.2;
+screen_w = 17.2;
+screen_h = 32.0;
+screen_clearance = 1.0;
 
 hole_dx = 13.28;
 hole_dy = 32.00;
@@ -15,8 +18,12 @@ standoff_d = 4.8;
 
 wall = 2.2;
 back_thickness = 2.4;
-lip_h = 1.6;
-lip_w = 1.3;
+front_thickness = 2.0;
+face_rim = 4.0;
+face_overhang = 4.0;
+wire_hole_w = 7.0;
+wire_hole_h = 4.5;
+wire_channel_d = 5.0;
 
 bar_d = 22.2;
 bar_clearance = 0.6;
@@ -29,9 +36,11 @@ clamp_nut_depth = 3.2;
 
 tilt_deg = 12;
 
-case_w = board_w + board_clearance * 2 + wall * 2;
-case_h = board_h + board_clearance * 2 + wall * 2;
-case_d = board_depth + back_thickness;
+case_w = board_w + board_clearance * 2 + wall * 2 + face_overhang * 2;
+case_h = board_h + board_clearance * 2 + wall * 2 + face_overhang * 2;
+case_d = board_depth + back_thickness + front_thickness;
+board_pocket_w = board_w + board_clearance * 2;
+board_pocket_h = board_h + board_clearance * 2;
 
 module rounded_box(size, r) {
     hull() {
@@ -41,24 +50,48 @@ module rounded_box(size, r) {
     }
 }
 
-module board_tray() {
+module board_pod() {
     difference() {
-        rounded_box([case_w, case_h, case_d], 3);
-        translate([wall, wall, back_thickness])
-            rounded_box([case_w - wall * 2, case_h - wall * 2, board_depth + 0.2], 2);
-        translate([case_w / 2 - 5.2, -0.1, back_thickness + 1.8])
-            cube([10.4, wall + 0.4, 5.6]);
+        rounded_box([case_w, case_h, case_d], 7);
+
+        // Back cavity accepts the PCB from behind, while the front face traps it.
+        translate([(case_w - board_pocket_w) / 2, (case_h - board_pocket_h) / 2, back_thickness])
+            rounded_box([board_pocket_w, board_pocket_h, board_depth + 0.25], 2);
+
+        // Window through the watch face for the LCD glass.
+        translate([
+            (case_w - screen_w - screen_clearance * 2) / 2,
+            (case_h - screen_h - screen_clearance * 2) / 2,
+            back_thickness + board_depth - 0.1
+        ])
+            rounded_box([
+                screen_w + screen_clearance * 2,
+                screen_h + screen_clearance * 2,
+                front_thickness + 0.3
+            ], 2.2);
+
+        // Bottom wire exit for power leads, with room for heat-shrink.
+        translate([case_w / 2 - wire_hole_w / 2, -0.2, back_thickness + 1.2])
+            cube([wire_hole_w, wall + 1.0, wire_hole_h]);
+        translate([case_w / 2 - wire_hole_w / 2, -wire_channel_d, back_thickness + 1.2])
+            cube([wire_hole_w, wire_channel_d + 0.4, wire_hole_h]);
     }
 
-    // Small front lips keep the board captive while leaving the screen open.
-    translate([wall, wall, back_thickness + board_depth - lip_h])
-        cube([case_w - wall * 2, lip_w, lip_h]);
-    translate([wall, case_h - wall - lip_w, back_thickness + board_depth - lip_h])
-        cube([case_w - wall * 2, lip_w, lip_h]);
-    translate([wall, wall, back_thickness + board_depth - lip_h])
-        cube([lip_w, case_h - wall * 2, lip_h]);
-    translate([case_w - wall - lip_w, wall, back_thickness + board_depth - lip_h])
-        cube([lip_w, case_h - wall * 2, lip_h]);
+    // A raised rim makes the enclosure read more like a watch body.
+    translate([face_rim / 2, face_rim / 2, case_d - 0.9])
+        difference() {
+            rounded_box([case_w - face_rim, case_h - face_rim, 0.9], 5.5);
+            translate([
+                (case_w - face_rim - screen_w - screen_clearance * 2 - 2.0) / 2,
+                (case_h - face_rim - screen_h - screen_clearance * 2 - 2.0) / 2,
+                -0.1
+            ])
+                rounded_box([
+                    screen_w + screen_clearance * 2 + 2.0,
+                    screen_h + screen_clearance * 2 + 2.0,
+                    1.1
+                ], 3);
+        }
 
     for (x = [-hole_dx / 2, hole_dx / 2])
         for (y = [-hole_dy / 2, hole_dy / 2])
@@ -95,7 +128,7 @@ module bar_clamp() {
 module holder() {
     translate([-case_w / 2, 10, 0])
         rotate([tilt_deg, 0, 0])
-            board_tray();
+            board_pod();
 
     translate([0, -10, -bar_d / 2 - 8])
         bar_clamp();
