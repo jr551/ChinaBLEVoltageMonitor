@@ -12,11 +12,17 @@ class VoltageUI {
   private:
     void drawStatic();
     void drawFuelBar(uint8_t percent);
-    void drawHistory();
+    void drawHistory(const SagHealthState& sag, const ChargeState& charge);
     uint8_t fuelPercent(float volts) const;
     void addHistory(float volts);
 
-    float history_[58] = {};
+    String lastStatus_;
+    String lastVoltage_;
+    String lastFuel_;
+    String lastBottom_;
+    uint8_t lastFuelPercent_ = 255;
+    bool lastCharging_ = false;
+    float history_[150] = {};
     uint8_t historyCount_ = 0;
     unsigned long lastFrameMs_ = 0;
     unsigned long lastSampleMs_ = 0;

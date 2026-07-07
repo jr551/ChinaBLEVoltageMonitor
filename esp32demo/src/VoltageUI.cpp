@@ -6,15 +6,16 @@
 #include <math.h>
 
 namespace {
-constexpr uint16_t kBg = 0x0841;
-constexpr uint16_t kPanel = 0x18E4;
-constexpr uint16_t kPanelDark = 0x10A2;
-constexpr uint16_t kInk = 0xE73C;
-constexpr uint16_t kMuted = 0x9492;
-constexpr uint16_t kLine = 0x4208;
-constexpr uint16_t kAcid = 0xBFCB;
-constexpr uint16_t kOrange = 0xFCCA;
-constexpr uint16_t kRed = 0xF986;
+constexpr uint16_t kBg = 0x0000;
+constexpr uint16_t kPanel = 0x0841;
+constexpr uint16_t kPanelDark = 0x0020;
+constexpr uint16_t kInk = 0xFFFF;
+constexpr uint16_t kMuted = 0xAD55;
+constexpr uint16_t kLine = 0x2945;
+constexpr uint16_t kAcid = 0xD7E6;
+constexpr uint16_t kOrange = 0xFD20;
+constexpr uint16_t kRed = 0xF800;
+constexpr uint16_t kAmber = 0xFFE0;
 
 void border(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
     LCD_FillRect(x, y, w, 1, color);
@@ -43,6 +44,13 @@ void line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color) {
         }
     }
 }
+
+uint16_t graphYFor(float volts, float low, float high, uint16_t graphY, uint16_t graphH) {
+    if (high <= low) return graphY + graphH / 2;
+    const float clamped = min(high, max(low, volts));
+    return graphY + graphH - 1 - static_cast<uint16_t>(
+        ((clamped - low) / (high - low)) * (graphH - 2));
+}
 }
 
 void VoltageUI::begin() {
@@ -53,22 +61,12 @@ void VoltageUI::begin() {
 
 void VoltageUI::drawStatic() {
     LCD_FillScreen(kBg);
-    LCD_FillRect(0, 0, LCD_WIDTH, 25, kPanelDark);
-    BitmapFont::drawString(10, 8, "BLE VOLTAGE LAB", kInk, kPanelDark, 1);
-
-    LCD_FillRect(8, 32, 201, 82, kPanel);
-    border(8, 32, 201, 82, kLine);
-    BitmapFont::drawString(18, 41, "TERMINAL VOLTAGE", kMuted, kPanel, 1);
-
-    LCD_FillRect(216, 32, 96, 82, kPanel);
-    border(216, 32, 96, 82, kLine);
-    BitmapFont::drawString(226, 42, "PACK", kMuted, kPanel, 1);
-    BitmapFont::drawString(226, 57, "10S LI-ION", kAcid, kPanel, 1);
-    BitmapFont::drawString(226, 75, "FULL 42.0V", kInk, kPanel, 1);
-
-    LCD_FillRect(8, 121, 304, 43, kPanelDark);
-    border(8, 121, 304, 43, kLine);
-    BitmapFont::drawString(17, 128, "VOLTAGE TRACE", kMuted, kPanelDark, 1);
+    LCD_FillRect(0, 0, LCD_WIDTH, 26, kPanelDark);
+    BitmapFont::drawString(8, 9, "BLE VOLTAGE", kMuted, kPanelDark, 1);
+    BitmapFont::drawString(258, 9, "WAIT", kOrange, kPanelDark, 1);
+    border(8, 56, 304, 84, kLine);
+    LCD_FillRect(8, 150, 304, 14, kPanelDark);
+    border(8, 150, 304, 14, kLine);
 }
 
 uint8_t VoltageUI::fuelPercent(float volts) const {
@@ -94,24 +92,31 @@ uint8_t VoltageUI::fuelPercent(float volts) const {
 }
 
 void VoltageUI::drawFuelBar(uint8_t percent) {
-    LCD_FillRect(18, 94, 181, 11, kPanelDark);
+    LCD_FillRect(8, 150, 304, 14, kPanelDark);
     const uint16_t color = percent < 15 ? kRed : (percent < 35 ? kOrange : kAcid);
-    const uint16_t width = static_cast<uint16_t>((177UL * percent) / 100UL);
-    if (width > 0) LCD_FillRect(20, 96, width, 7, color);
-    border(18, 94, 181, 11, kLine);
+    const uint16_t width = static_cast<uint16_t>((296UL * percent) / 100UL);
+    if (width > 0) LCD_FillRect(12, 154, width, 6, color);
+    border(8, 150, 304, 14, kLine);
 }
 
 void VoltageUI::addHistory(float volts) {
-    if (historyCount_ < 58) {
+    if (historyCount_ < 150) {
         history_[historyCount_++] = volts;
     } else {
-        memmove(history_, history_ + 1, sizeof(float) * 57);
-        history_[57] = volts;
+        memmove(history_, history_ + 1, sizeof(float) * 149);
+        history_[149] = volts;
     }
 }
 
-void VoltageUI::drawHistory() {
-    LCD_FillRect(17, 140, 286, 17, kPanelDark);
+void VoltageUI::drawHistory(const SagHealthState& sag, const ChargeState& charge) {
+    constexpr uint16_t graphX = 10;
+    constexpr uint16_t graphY = 58;
+    constexpr uint16_t graphW = 300;
+    constexpr uint16_t graphH = 80;
+    LCD_FillRect(graphX, graphY, graphW, graphH, kBg);
+    LCD_FillRect(graphX, graphY + 19, graphW, 1, kLine);
+    LCD_FillRect(graphX, graphY + 39, graphW, 1, kLine);
+    LCD_FillRect(graphX, graphY + 59, graphW, 1, kLine);
     if (historyCount_ < 2) return;
     float low = history_[0];
     float high = history_[0];
@@ -123,72 +128,116 @@ void VoltageUI::drawHistory() {
         high += 0.1F;
         low -= 0.1F;
     }
+
+    BitmapFont::drawString(graphX + 4, graphY + 3, String(high, 1), kMuted, kBg, 1);
+    BitmapFont::drawString(graphX + 4, graphY + graphH - 11, String(low, 1), kMuted, kBg, 1);
+
     for (uint8_t index = 1; index < historyCount_; ++index) {
-        const uint16_t x0 = 17 + (index - 1) * 5;
-        const uint16_t x1 = 17 + index * 5;
-        const uint16_t y0 = 156 - static_cast<uint16_t>(
-            ((history_[index - 1] - low) / (high - low)) * 15.0F);
-        const uint16_t y1 = 156 - static_cast<uint16_t>(
-            ((history_[index] - low) / (high - low)) * 15.0F);
+        const uint16_t x0 = graphX + (index - 1) * 2;
+        const uint16_t x1 = graphX + index * 2;
+        const uint16_t y0 = graphYFor(history_[index - 1], low, high, graphY, graphH);
+        const uint16_t y1 = graphYFor(history_[index], low, high, graphY, graphH);
         line(x0, y0, x1, y1, kAcid);
+        line(x0, y0 + 1, x1, y1 + 1, kAcid);
+    }
+
+    const float latest = history_[historyCount_ - 1];
+    const uint16_t latestY = graphYFor(latest, low, high, graphY, graphH);
+    const uint16_t markerColor = sag.inSag ? kOrange : (charge.likelyCharging ? kAmber : kInk);
+    LCD_FillRect(graphX + graphW - 5, latestY > graphY + 1 ? latestY - 1 : latestY, 4, 4, markerColor);
+
+    const uint16_t tagY = latestY < graphY + 12
+        ? graphY + 12
+        : (latestY > graphY + graphH - 18 ? graphY + graphH - 18 : latestY - 6);
+    LCD_FillRect(graphX + graphW - 58, tagY, 54, 10, kPanelDark);
+    BitmapFont::drawString(graphX + graphW - 55, tagY + 2, String(latest, 2) + "V", markerColor, kPanelDark, 1);
+
+    if (sag.inSag) {
+        BitmapFont::drawString(graphX + graphW - 44, graphY + 4, "SAG", kOrange, kBg, 1);
+    } else if (charge.likelyCharging) {
+        BitmapFont::drawString(graphX + graphW - 62, graphY + 4, "CHARGE", kAmber, kBg, 1);
     }
 }
 
 void VoltageUI::render(
     const MonitorState& state, const SagHealthState& sag, const ChargeState& charge) {
-    if (millis() - lastFrameMs_ < 250) return;
+    if (millis() - lastFrameMs_ < 500) return;
     lastFrameMs_ = millis();
 
-    LCD_FillRect(236, 7, 75, 10, kPanelDark);
-    const char* status = charge.likelyCharging
-        ? "CHARGING"
+    const String status = charge.likelyCharging
+        ? "CHARGE"
         : (state.connected
-            ? "CONNECTED"
-            : (state.scanning ? "SCANNING" : "SEARCHING"));
-    BitmapFont::drawString(236, 8, status,
-                           (state.connected || charge.likelyCharging) ? kAcid : kOrange,
-                           kPanelDark, 1);
+            ? "LIVE"
+            : (state.scanning ? "SCAN" : "WAIT"));
+    if (status != lastStatus_) {
+        LCD_FillRect(232, 6, 82, 12, kPanelDark);
+        BitmapFont::drawString(258, 9, status,
+                               (state.connected || charge.likelyCharging) ? kAcid : kOrange,
+                               kPanelDark, 1);
+        lastStatus_ = status;
+    }
 
-    LCD_FillRect(18, 56, 181, 33, kPanel);
+    String voltageText = "--.--V";
+    String fuelText = "--";
+    uint8_t fuel = 0;
+    uint16_t fuelColor = kMuted;
     if (state.voltageValid) {
-        BitmapFont::drawString(18, 57, String(state.volts, 2), kInk, kPanel, 4);
-        BitmapFont::drawString(158, 70, "V", kAcid, kPanel, 2);
+        voltageText = String(state.volts, 2) + "V";
         const float fuelVoltage = sag.referenceVoltage > 0.0F
             ? sag.referenceVoltage : state.volts;
-        const uint8_t fuel = fuelPercent(fuelVoltage);
-        BitmapFont::drawString(226, 94, String(fuel) + "/100", kInk, kPanel, 1);
-        drawFuelBar(fuel);
+        fuel = fuelPercent(fuelVoltage);
+        fuelText = String(fuel);
+        fuelColor = fuel < 15 ? kRed : (fuel < 35 ? kAmber : kAcid);
 
         if (millis() - lastSampleMs_ >= 1000) {
             lastSampleMs_ = millis();
             addHistory(state.volts);
+            drawHistory(sag, charge);
         }
-    } else {
-        BitmapFont::drawString(18, 65, "--.--", kMuted, kPanel, 3);
-        BitmapFont::drawString(226, 94, "--/100", kMuted, kPanel, 1);
-        drawFuelBar(0);
     }
 
-    LCD_FillRect(226, 107, 77, 6, kPanel);
-    String flags = "F " + String(state.flagA) + "/" + String(state.flagB);
-    if (state.rssi > -120) flags += " " + String(state.rssi);
-    BitmapFont::drawString(226, 106, flags, kMuted, kPanel, 1);
-
-    LCD_FillRect(226, 84, 77, 8, kPanel);
-    String sagLabel;
-    if (sag.scoreValid) {
-        sagLabel = "SAG " + String(sag.score) + "/100";
-    } else {
-        sagLabel = "SAG " + String(sag.eventCount) + "/3";
+    if (voltageText != lastVoltage_) {
+        LCD_FillRect(0, 30, 190, 24, kBg);
+        const uint8_t voltageScale = 3;
+        const uint16_t voltageY = 32;
+        BitmapFont::drawString(8, voltageY, voltageText, state.voltageValid ? kInk : kMuted, kBg, voltageScale);
+        lastVoltage_ = voltageText;
     }
-    BitmapFont::drawString(226, 84, sagLabel,
-                           sag.inSag ? kOrange : kMuted, kPanel, 1);
-    drawHistory();
 
-    const uint16_t glow = ((millis() / 350) % 2) ? kAcid : 0x4E47;
-    border(0, 0, LCD_WIDTH, LCD_HEIGHT,
-           charge.likelyCharging ? glow : kBg);
-    if (charge.likelyCharging) {
-        border(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, glow);
+    if (fuelText != lastFuel_) {
+        LCD_FillRect(226, 30, 90, 24, kBg);
+        BitmapFont::drawString(226, 32, fuelText + "%", fuelColor, kBg, 3);
+        lastFuel_ = fuelText;
+    }
+
+    if (fuel != lastFuelPercent_) {
+        drawFuelBar(fuel);
+        lastFuelPercent_ = fuel;
+    }
+
+    String bottom = "";
+    if (sag.scoreValid) bottom = "HEALTH " + String(sag.score) + "%";
+    if (charge.likelyCharging) bottom = "CHARGING";
+    if (sag.inSag) bottom = "SAGGING";
+    if (bottom != lastBottom_) {
+        LCD_FillRect(160, 8, 70, 8, kPanelDark);
+        BitmapFont::drawString(160, 9, bottom, sag.inSag ? kOrange : kMuted, kPanelDark, 1);
+        lastBottom_ = bottom;
+    }
+
+    if (charge.likelyCharging != lastCharging_) {
+        border(0, 0, LCD_WIDTH, LCD_HEIGHT,
+               charge.likelyCharging ? kAcid : kBg);
+        if (charge.likelyCharging) {
+            border(2, 2, LCD_WIDTH - 4, LCD_HEIGHT - 4, kAcid);
+        } else {
+            drawStatic();
+            lastStatus_ = "";
+            lastVoltage_ = "";
+            lastFuel_ = "";
+            lastBottom_ = "";
+            lastFuelPercent_ = 255;
+        }
+        lastCharging_ = charge.likelyCharging;
     }
 }
