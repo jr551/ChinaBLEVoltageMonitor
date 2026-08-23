@@ -47,6 +47,11 @@ Battery Detector” for 12 V and 24 V systems. A matching case or product name
 does not guarantee matching firmware, so verify service UUID `FFF0` before
 experimenting.
 
+## Requirements
+
+- **Node.js** `^20.19.0` or `>=22.12.0` (required by Vite 7). The GitHub Pages workflow uses Node 22.
+- A Chromium-based desktop or Android browser with Web Bluetooth (Chrome or Edge).
+
 ## Try it
 
 Web Bluetooth requires a secure context. Use the published GitHub Pages site,
